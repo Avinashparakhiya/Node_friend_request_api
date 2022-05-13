@@ -1,12 +1,12 @@
 const User = require('../../models/User')
 const FriendRequest = require('../../models/FriendRequest')
 const FilterUserData = require('../../utils/FilterUserData')
+const RecommanDedFilterUserData = require ('../../utils/RecommanDedFilterUserData')
 
 exports.fetchUserById = async (req, res) => {
   try {
     const user = await User.findById(req.params.user_id).populate('friends')
     const userData = FilterUserData(user)
-
     res.status(200).json({ user: userData })
   } catch (err) {
     console.log(err)
@@ -16,15 +16,24 @@ exports.fetchUserById = async (req, res) => {
 
 exports.fetchRecommendedUsers = async (req, res) => {
   try {
-    const users = await User.find()
-      .where('_id')
-      .ne(req.userId)
-      .populate('friends')
-
-    const usersData = users.map((user) => {
-      return FilterUserData(user)
+    // const users = await User.find()
+    //   .where('_id')
+    //   .ne(req.userId)
+    //   .populate('friends')
+    // const usersData = users.friends.map((user) => {
+    //   return RecommanDedFilterUserData(user)
+    // })
+    const user = await User.findById(req.userId).populate('friends')
+    const friends = user.friends.map((friend) => {
+      return {
+        ...RecommanDedFilterUserData(friend),
+      }
     })
-    res.status(200).json({ users: usersData })
+    console.log("hello123",friends);
+    if(friends.length==0){
+      res.status(200).json({ users: "No Recommended Friend" })  
+    }else{
+    res.status(200).json({ users: friends })}
   } catch (err) {
     console.log(err)
     return res.status(500).json({error:"Something went wrong"})
@@ -43,6 +52,7 @@ exports.me = async (req, res) => {
         ...FilterUserData(friend),
       }
     })
+    console.log("friends",friends);
     userData.friends = friends
     res.status(200).json({ user: userData})
   } catch (err) {

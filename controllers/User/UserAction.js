@@ -60,6 +60,8 @@ exports.sendFriendRequest = async (req, res) => {
 exports.acceptFriendRequest = async (req, res) => {
   try {
     const friendsRequest = await FriendRequest.findById(req.params.requestId)
+    console.log("requestId ::",req.params.requestId);
+    console.log("============================");
     if (!friendsRequest) {
       return res
         .status(404)
@@ -101,7 +103,7 @@ exports.cancelSendedFriendRequest = async (req, res) => {
     if (!friendsRequest) {
       return res
         .status(404)
-        .json({ error: 'Request already cenceled or not sended yet' })
+        .json({ error: 'Request already canceled or not sended yet' })
     }
     await FriendRequest.deleteOne({ _id: req.params.requestId })
 
